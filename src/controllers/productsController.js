@@ -6,11 +6,27 @@ const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
 
 const toThousand = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
+
+const nuevoId = () => {
+    let ultimo = 0;
+    products.forEach(product => {
+        if (product.id > ultimo) {
+            ultimo = product.id;
+        }
+    });
+    return ultimo + 1;
+}
+
+let nuevoId = function (){
+	let ultimo = products.length
+}
+
+
 const controller = {
 	// Root - Show all products
-	//index: (req, res) => {
-		// Do the magic
-	//},
+	index: (req, res) => {
+		res.render('products', {products, toThousand})
+	},
 
 	// Detail - Detail from one product
 	detail: (req, res) => {
@@ -18,6 +34,7 @@ const controller = {
         let producto = products.find(element => { return element.id == req.params.id })
 
         res.render('detail', {producto, toThousand});
+
     },
 
 	// Create - Form to create
@@ -29,34 +46,56 @@ const controller = {
 
 	store: (req, res) => {
 		const nuevoProducto = {
-
+id: nuevoId(),
 		name: req.body.name,
 		price: req.body.price,
 		category: req.body.category,
 		description: req.body.description
 		}
-		const baseDeDatos = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/productsDataBase.json'), 'utf-8'))
-		baseDeDatos.push(nuevoProducto)
-		const productoJSON = JSON.stringify(baseDeDatos)
+		
+		products.push(nuevoProducto)
+		const productoJSON = JSON.stringify(products)
 		fs.writeFileSync( productsFilePath, productoJSON)
-		//res.redirect("/")
-		res.send(productoJSON)
-		//res.redirect("/create")
+		res.redirect("/products")
+
+
 	},
 
 	// Update - Form to edit
-	//edit: (req, res) => {
-		// Do the magic
-	//},
+	edit: (req, res) => {
+		let id = req.params.id
+		let productToEdit = products.find(element=> element.id == id);		
+		res.render('product-edit-form', {product: productToEdit})
+	},
 	// Update - Method to update
-	//update: (req, res) => {
-		// Do the magic
-	//},
+	update: (req, res) => {
+		products.forEach((element)  => {
+			if (element.id == req.params.id){
+				element.name = req.body.name;
+                element.description = req.body.description;
+                element.price = req.body.price;
+                element.discount = req.body.discount;
+                element.category = req.body.category;
+			}
+		})
 
+		const productosJSON = JSON.stringify(products)
+		fs.writeFileSync(productsFilePath, productosJSON)
+		res.redirect('/products');
+
+	},
+
+	
 	// Delete - Delete one product from DB
-	//destroy : (req, res) => {
-		// Do the magic
-	//}
+	destroy : (req, res) => 
+	
+{let productosRestantes = products.filter(element => element.id != req.params.id)
+
+	const productosJSON = JSON.stringify(productosRestantes, null)
+	fs.writeFileSync(productsFilePath, productosJSON)
+	res.redirect('/products');
+
+	}
 };
 
 module.exports = controller;
