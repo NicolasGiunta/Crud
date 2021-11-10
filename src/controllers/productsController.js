@@ -17,10 +17,6 @@ const nuevoId = () => {
     return ultimo + 1;
 }
 
-let nuevoId = function (){
-	let ultimo = products.length
-}
-
 
 const controller = {
 	// Root - Show all products
@@ -91,7 +87,7 @@ id: nuevoId(),
 	
 {let productosRestantes = products.filter(element => element.id != req.params.id)
 
-	const productosJSON = JSON.stringify(productosRestantes, null)
+	const productosJSON = JSON.stringify(productosRestantes)
 	fs.writeFileSync(productsFilePath, productosJSON)
 	res.redirect('/products');
 
